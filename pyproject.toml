@@ -1,0 +1,16 @@
+[project]
+name = "lazybitlockerdecryptor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=46.0.5",
+    "wmi>=1.5.1",
+]
+
+[project.scripts]
+lzbit = "lzbit.main:main"
+
+[tool.uv]
+package = true
