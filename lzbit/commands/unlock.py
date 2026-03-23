@@ -41,8 +41,13 @@ def handle(args):
         
         drive_letter = vhd_manager.get_drive_letter_for_vhd(str(vhd_path))
         display_target = drive_letter if drive_letter else device_id
+        print(f"[*] 대상 볼륨 확인됨: {display_target}")
         
-        protection_status = bitlocker_manager.get_protection_status(device_id)
+        try:
+            protection_status = bitlocker_manager.get_protection_status(device_id)
+        except Exception as e:
+            print(f"[-] 에러: 볼륨 보호 상태를 확인하는 중 예기치 않은 오류 발생: {e}")
+            sys.exit(1)
         
         if protection_status == BitLockerProtectionStatus.ERROR:
             print("[-] 에러: 볼륨의 보호 상태를 확인할 수 없습니다.")
@@ -51,7 +56,11 @@ def handle(args):
             print(f"[+] 볼륨({display_target})은 BitLocker가 적용되지 않은 일반 볼륨입니다. (작업 건너뜀)")
             sys.exit(0)
 
-        lock_status = bitlocker_manager.get_lock_status(device_id)
+        try:
+            lock_status = bitlocker_manager.get_lock_status(device_id)
+        except Exception as e:
+            print(f"[-] 에러: 볼륨 잠금 상태(lock status)를 확인하는 중 오류 발생: {e}")
+            sys.exit(1)
         
         if lock_status == BitLockerLockStatus.UNLOCKED:
             print(f"[+] 볼륨({display_target})은 이미 잠금 해제되어 있습니다. (작업 건너뜀)")
