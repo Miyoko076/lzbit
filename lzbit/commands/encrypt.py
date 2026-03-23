@@ -28,7 +28,6 @@ def handle(args):
 
     drive_letter = vhd_manager.get_drive_letter_for_vhd(str(vhd_path))
     display_target = drive_letter if drive_letter else device_id
-    
     print(f"[*] 대상 볼륨 확인됨: {display_target}")
 
     try:

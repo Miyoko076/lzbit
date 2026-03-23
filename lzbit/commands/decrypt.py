@@ -9,7 +9,7 @@ def handle(args):
     """VHD의 BitLocker 암호화를 완전히 해제하고 일반 볼륨(NTFS)으로 되돌립니다."""
     vhd_path = Path(args.vhd_path).resolve()
     
-    print(f"[*] 복호화(완전 해제) 셋업을 시작합니다: {vhd_path}")
+    print(f"[*] 복호화 셋업을 시작합니다: {vhd_path}")
     
     vhd_manager = VhdManager()
     bitlocker_manager = BitLockerManager()
@@ -42,7 +42,7 @@ def handle(args):
     try:
         lock_status = bitlocker_manager.get_lock_status(device_id)
     except Exception as e:
-        print(f"[-] 에러: 볼륨 잠금 상태(lock status)를 확인하는 중 예기치 않은 오류 발생: {e}")
+        print(f"[-] 에러: 볼륨 잠금 상태(lock status)를 확인하는 중 오류 발생: {e}")
         sys.exit(1)
 
     if lock_status == BitLockerLockStatus.LOCKED:
@@ -58,7 +58,10 @@ def handle(args):
         print(f"[-] 에러: 암호화 진행률을 확인하는 중 예기치 않은 오류 발생: {e}")
         sys.exit(1)
 
-    if protection_status == BitLockerProtectionStatus.UNPROTECTED and percent == 0:
+    if 0 < percent < 100:
+        print(f"[-] 에러: 볼륨({display_target})은 현재 암호화 또는 복호화가 진행 중입니다. (진행률: {percent}%)\n완료 후 다시 시도해 주세요.")
+        sys.exit(1)
+    elif percent == 0 and protection_status == BitLockerProtectionStatus.UNPROTECTED:
         print(f"[+] 볼륨({display_target})은 BitLocker가 적용되지 않은 일반 볼륨이거나 완전히 복호화되어 있습니다. (작업 건너뜀)")
         sys.exit(0)
 
@@ -70,7 +73,7 @@ def handle(args):
             try:
                 current_percent = bitlocker_manager.get_encryption_percentage(device_id)
             except Exception as e:
-                print(f"\n[-] 치명적 에러: 모니터링 중 볼륨 상태를 읽을 수 없습니다. (디스크 연결 끊김 등)\n상세: {e}")
+                print(f"\n[-] 에러: 모니터링 중 볼륨 상태를 읽을 수 없습니다. 상세: {e}")
                 sys.exit(1)
             
             print(f"\r[*] 복호화 진행 중... (남은 암호화 비율: {current_percent:>3}%)", end="", flush=True)
