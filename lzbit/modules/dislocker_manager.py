@@ -1,5 +1,6 @@
 import subprocess
 import re
+import shlex
 from pathlib import Path
 
 class DislockerManager:
@@ -14,11 +15,13 @@ class DislockerManager:
 
         wsl_ram_path = f"/dev/shm/{target_path.name}"
         
+        safe_wsl_ram_path = shlex.quote(wsl_ram_path)
+        
         try:
             with open(target_path, "rb") as f:
                 bek_data = f.read()
 
-            setup_cmd = ["wsl", "bash", "-c", f"cat > '{wsl_ram_path}'"]
+            setup_cmd = ["wsl", "bash", "-c", f"cat > {safe_wsl_ram_path}"]
             subprocess.run(setup_cmd, input=bek_data, check=True)
 
             command = ["wsl", "-e", "dislocker-bek", "-f", wsl_ram_path]
@@ -53,4 +56,4 @@ class DislockerManager:
                 raise Exception(f"Process failed: {e}")
                 
         finally:
-            subprocess.run(["wsl", "rm", "-f", wsl_ram_path])
+            subprocess.run(["wsl", "-e", "rm", "-f", wsl_ram_path])
