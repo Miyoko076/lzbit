@@ -71,7 +71,7 @@ def handle(args):
                 
             if not secret_string:
                 print("[-] 키 입력이 취소되었거나 유효하지 않습니다.")
-                sys.exit(0)
+                sys.exit(1)
             
             raw_key = crypto_manager.load_and_decrypt(str(key_path), secret_string)
             

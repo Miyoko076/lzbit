@@ -23,7 +23,7 @@ def handle(args):
             
         if not secret_string:
             print("[-] 키 입력이 취소되었거나 유효하지 않습니다.")
-            sys.exit(0)
+            sys.exit(1)
             
         raw_key = dislocker_manager.get_key_from_bek(str(bek_path))
         
